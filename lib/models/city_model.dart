@@ -1,64 +1,43 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:flutterllearnapp/models/weather_stat_model.dart';
+
 class CityModel {
   String name;
-  String country;
   double lat;
   double lng;
+  late WeatherStatModel currentWeather;
+  late List<WeatherStatModel> hourlyWeather;
 
   CityModel({
     required this.name,
-    required this.country,
     required this.lat,
-    required this.lng
+    required this.lng,
+    required this.currentWeather,
+    required this.hourlyWeather
   });
 
-
-  factory CityModel.fromCsvRow(List<String> row){
-    if(row.length != 4){
-      throw FormatException('CSV row must have exactly 4 columns: name, country, lat, lng');
-    }
+  factory CityModel.defaultCity(){
     return CityModel(
-      name: row[0].trim(),
-      country: row[3].trim(),
-      lat: double.parse(row[2].trim()),
-      lng: double.parse(row[1].trim()),
+      name: "London", 
+      lat: 51.5073219, 
+      lng: -0.1276474, 
+      currentWeather: WeatherStatModel.empty(),
+      hourlyWeather: List.empty()
     );
   }
 
-  static List<CityModel> getCities() {
-    List<CityModel> cities = [];
+  void fetchWeatherData(double lat, double lng) async {
+    http.Response res = await http.get(Uri.parse("https://api.openweathermap.org/data/3.0/onecall?lat=$lat&lon=$lng&appid=3c1337f474bf021bc368451dfd604fca&units=metric"));
 
-    // String filePath = AssetManager. ("assets/files/cities.csv");
-    // File file = File(filePath);
-    // if(file.existsSync()){
-    //   return [];
-    // }
+    Map<String, dynamic> dataJson = jsonDecode(res.body);
 
-    // try {
-    //   fileData = file.readAsStringSync();
-    // } catch (e) {
-    //   print(e);
-    // }
+    Map<String, dynamic> currentData = dataJson['current'];
+    currentWeather = WeatherStatModel.fromJSON(currentData);
 
-    // String fileData = rootBundle.loadString('assets/files/cities.csv');
-    // List<String> lines = const LineSplitter().convert(fileData);
-    // if(lines.isEmpty){
-    //   print("lines empty");
-    //   return [];
-    // }
-    // for (var i = 0; i < lines.length; i++) {
-    //   String line = lines[i].trim();
-    //   print(line);
-    //   if(line.isEmpty){
-    //     continue;
-    //   }
-
-    //   List<String> values = line.split(',');
-    //   try {
-    //     cities.add(CityModel.fromCsvRow(values));
-    //   // ignore: empty_catches
-    //   } catch (e){}
-    // }
-
-    return cities;
+    List<dynamic> hourlyWeatherData = dataJson['hourly'];
+    hourlyWeatherData = hourlyWeatherData
+      .map((hourlyMap) => WeatherStatModel.fromJSON(hourlyMap as Map<String, dynamic>))
+      .toList();
   }
 }
