@@ -40,4 +40,11 @@ class CityModel {
       .map((hourlyMap) => WeatherStatModel.fromJSON(hourlyMap as Map<String, dynamic>))
       .toList();
   }
+
+  String currentWeatherTime() {
+    String dateTime = currentWeather.time.toString();
+    String timeWithSec = dateTime.split(' ')[1];
+    List<String> hmsList = timeWithSec.split(':');
+    return "${hmsList[0]}:${hmsList[1]}";
+  }
 }

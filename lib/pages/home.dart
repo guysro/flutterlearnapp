@@ -96,39 +96,135 @@ class _HomePageState extends State<HomePage> {
 
   Container _body() {
     return Container(
-        alignment: Alignment.center,
-        child:loading ? _loadingCircle() : _dataBox()
+        child:loading ? _loadingCircle() : _dataBox(currentCity.currentWeather)
       );
   }
 
-  Column _loadingCircle() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        const CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Color(0xffDDDADA)),
-          strokeWidth: 5.0,
-          strokeCap: StrokeCap.square,
-          backgroundColor: Color.fromARGB(159, 0, 0, 0),
-          constraints: BoxConstraints(minHeight: 100, minWidth: 100),
-          padding: EdgeInsets.only(bottom: 100),
-        ),
-      ],
+  Widget _loadingCircle() {
+
+    return Container(
+      alignment: Alignment.center,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Color(0xffDDDADA)),
+            strokeWidth: 5.0,
+            strokeCap: StrokeCap.square,
+            backgroundColor: Color.fromARGB(159, 0, 0, 0),
+            constraints: BoxConstraints(minHeight: 100, minWidth: 100),
+            padding: EdgeInsets.only(bottom: 100),
+          ),
+        ],
+      ),
     );
   }
 
-  Column _dataBox() {
-    return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(currentCity.name),
-        Text("${currentCity.currentWeather.temp}"),
-        Text("${currentCity.currentWeather.feelsLike}"),
-        Text("${currentCity.currentWeather.uvIdx}" ),
-        Text("${currentCity.currentWeather.windSpeed}"),
-      ],
-      );
+  Widget _dataBox(WeatherStatModel weather) {
+    // from left to right: sky icon, temp, sky 
+    return Container(
+      padding: EdgeInsets.only(left: 15),
+      decoration: BoxDecoration(
+        color: Color.fromARGB(33, 255, 255, 255),
+        boxShadow: [
+          BoxShadow(
+            color: Color.fromRGBO(29,22,23,0.11),
+            blurRadius: 40,
+            spreadRadius: 10
+          )
+        ],
+      ),
+      height: 100,
+      clipBehavior: Clip.none,
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // need to make icon dependent of sky state
+              SvgPicture.asset(
+                'assets/icons/sun.svg',
+                height: 50,
+              ),
+              SizedBox(
+                width: 12,
+              ),
+              Text(
+                weather.temp.toStringAsFixed(0),
+                style: TextStyle(
+                  fontSize: 36
+                ),
+              ),
+              SvgPicture.asset(
+                'assets/icons/celsius.svg',
+                height: 36,
+              )
+            ],
+          ),
+          
+          // Text("${weather.windSpeed}"),
+          Container(
+            padding: EdgeInsets.only(top: 10, right: 10),
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  'Feels Like: '
+                ),
+                Row(
+                  children: [
+                    Text(
+                      weather.feelsLike.toStringAsFixed(0),
+                      style: TextStyle(
+                        fontSize: 22,
+                        
+                      ),
+                    ),
+                    SvgPicture.asset(
+                      'assets/icons/celsius.svg',
+                      height: 22,
+                    ),
+                  ],
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/wind.svg',
+                      height: 28,
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text(
+                      weather.windSpeed.toStringAsFixed(1),
+                      style: TextStyle(
+                        fontSize: 16,
+                      ),
+                    ),
+                    Text(
+                      'km/h',
+                      style: TextStyle(
+                        fontSize: 12,
+
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+          // Text(weatherTime())
+        ],
+      )
+    );
+
   }
 
   Container _searchField() {
@@ -214,7 +310,7 @@ class _HomePageState extends State<HomePage> {
   AppBar appBar() {
     return AppBar(
       title: Text(
-        'Weather',
+        currentCity.name,
         style: TextStyle(
           color: Colors.black,
           fontSize: 22,
