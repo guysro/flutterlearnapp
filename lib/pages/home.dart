@@ -19,6 +19,18 @@ class _HomePageState extends State<HomePage> {
   bool loading = true;
   CityModel currentCity = CityModel.defaultCity();
   
+  String limitStringToWords(String text, int wordLimit) {
+    if (wordLimit <= 0) {
+      return '';
+    }
+    List<String> words = text.split(RegExp(r'\s+')).where((s) => s.isNotEmpty).toList();
+    if (words.length <= wordLimit) {
+      return text.trim();
+    }
+    List<String> limitedWords = words.sublist(0, wordLimit);
+    return limitedWords.join(' ');
+  }
+
   void _getCurrentCity() async {
     setState(() {
       loading = true;
@@ -43,7 +55,7 @@ class _HomePageState extends State<HomePage> {
 
     Position currentPosition = await Geolocator.getCurrentPosition();
     
-    // print(currentPosition.toString());
+    print(currentPosition.toString());
     double lat = currentPosition.latitude;
     double lng = currentPosition.longitude;
     http.Response res = await http.get(Uri.parse("https://api.openweathermap.org/data/3.0/onecall?lat=$lat&lon=$lng&appid=3c1337f474bf021bc368451dfd604fca&units=metric"));
@@ -59,7 +71,13 @@ class _HomePageState extends State<HomePage> {
       .toList();
 
     String timezone = dataJson['timezone'];
-    String cityName = timezone.split('/')[1];
+
+    http.Response locRes = await http.get(Uri.parse("http://api.openweathermap.org/geo/1.0/reverse?lat=$lat&lon=$lng&limit=1&appid=3c1337f474bf021bc368451dfd604fca"));
+    
+    
+    List<dynamic> locData = jsonDecode(locRes.body);
+    print(locData[0]['name']);
+    String cityName = limitStringToWords(locData[0]['name'], 2);
 
     currentCity = CityModel(
       name: cityName,
@@ -68,7 +86,7 @@ class _HomePageState extends State<HomePage> {
       currentWeather: currentWeather, 
       hourlyWeather: hourlyWeather
     );  
-    print(currentCity.currentWeather.toString());
+    // print(currentCity.currentWeather.toString());
     setState(() {
       loading = false;
     });
@@ -145,13 +163,25 @@ class _HomePageState extends State<HomePage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // need to make icon dependent of sky state
-              SvgPicture.asset(
-                'assets/icons/sun.svg',
-                height: 50,
+              Image.network(
+                'https://openweathermap.org/img/wn/${weather.icon}@2x.png',
+                loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                  if (loadingProgress == null) {
+                    return child;
+                  }
+                  return Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                              loadingProgress.expectedTotalBytes!
+                          : null,
+                    ),
+                  );
+                },
+                height: 80,
               ),
               SizedBox(
-                width: 12,
+                width: 0,
               ),
               Text(
                 weather.temp.toStringAsFixed(0),

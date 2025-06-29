@@ -7,6 +7,7 @@ class WeatherStatModel {
   String skyState;
   num uvIdx;
   num windSpeed;
+  String icon;
 
   WeatherStatModel({
     required this.temp,
@@ -14,7 +15,8 @@ class WeatherStatModel {
     required this.skyState,
     required this.time,
     required this.uvIdx,
-    required this.windSpeed
+    required this.windSpeed,
+    required this.icon
   });
 
   factory WeatherStatModel.currentFromJSON(String jsonStr){
@@ -27,7 +29,8 @@ class WeatherStatModel {
       skyState: currentData['weather'][0]['main'], 
       time: currentData['dt'], 
       uvIdx: currentData['uvi'], 
-      windSpeed: currentData['wind_speed']
+      windSpeed: currentData['wind_speed'],
+      icon: "01d"
     );
   }
 
@@ -38,7 +41,8 @@ class WeatherStatModel {
       skyState: "Sunny", 
       time: DateTime.now(), 
       uvIdx: 0, 
-      windSpeed: 0
+      windSpeed: 0,
+      icon: "01d"
     ); 
   }
   
@@ -53,6 +57,7 @@ class WeatherStatModel {
       temp: data['temp'], 
       feelsLike: data['feels_like'], 
       skyState: data['weather'][0]['main'], 
+      icon: data['weather'][0]['icon'], 
       time: dateTime, 
       uvIdx: data['uvi'], 
       windSpeed: data['wind_speed']

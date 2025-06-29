@@ -19,7 +19,7 @@ class CityModel {
 
   factory CityModel.defaultCity(){
     return CityModel(
-      name: "London", 
+      name: "", 
       lat: 51.5073219, 
       lng: -0.1276474, 
       currentWeather: WeatherStatModel.empty(),
