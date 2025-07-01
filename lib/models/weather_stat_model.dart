@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
-import 'package:flutter/foundation.dart';
 
 class WeatherStatModel {
   DateTime time;
@@ -10,7 +8,6 @@ class WeatherStatModel {
   num uvIdx;
   num windSpeed;
   String iconString;
-  Uint8List iconBytes = Uint8List(1);
 
   WeatherStatModel({
     required this.temp,

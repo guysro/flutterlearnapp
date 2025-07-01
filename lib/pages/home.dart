@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:flutterllearnapp/models/weather_stat_model.dart';
 import 'package:http/http.dart' as http;
@@ -7,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutterllearnapp/models/city_model.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:local_rembg/local_rembg.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -71,7 +69,6 @@ class _HomePageState extends State<HomePage> {
     List<WeatherStatModel> hourlyWeather = hourlyWeatherData
       .map((hourlyMap) => WeatherStatModel.fromJSON(hourlyMap as Map<String, dynamic>))
       .toList();
-    hourlyWeather = hourlyWeather.sublist(0, 4);
     print(hourlyWeather);
     http.Response locRes = await http.get(Uri.parse("http://api.openweathermap.org/geo/1.0/reverse?lat=$lat&lon=$lng&limit=1&appid=3c1337f474bf021bc368451dfd604fca"));
     
@@ -79,28 +76,6 @@ class _HomePageState extends State<HomePage> {
     print(locData[0]['name']);
     String cityName = limitStringToWords(locData[0]['name'], 2);
     
-    http.Response icon = await http.get(Uri.parse('https://openweathermap.org/img/wn/${currentWeather.iconString}@2x.png'));
-    Uint8List bytes = icon.bodyBytes;
-    LocalRembgResultModel rembgRes = await LocalRembg.removeBackground(imageUint8List: bytes);
-    if(rembgRes.status == 1){
-      currentWeather.iconBytes = Uint8List.fromList(rembgRes.imageBytes!);
-    }
-    else{
-      currentWeather.iconBytes = bytes;
-    }
-
-    for (var weatherData in hourlyWeather) {
-      http.Response icon = await http.get(Uri.parse('https://openweathermap.org/img/wn/${weatherData.iconString}@2x.png'));
-      Uint8List bytes = icon.bodyBytes;
-      LocalRembgResultModel rembgRes = await LocalRembg.removeBackground(imageUint8List: bytes);
-      if(rembgRes.status == 1){
-        weatherData.iconBytes = Uint8List.fromList(rembgRes.imageBytes!);
-      }
-      else{
-        weatherData.iconBytes = bytes;
-      }
-    }
-
     currentCity = CityModel(
       name: cityName,
       lat: currentPosition.latitude, 
@@ -142,20 +117,12 @@ class _HomePageState extends State<HomePage> {
           _dataBox(currentCity.currentWeather),
           SizedBox(height: 100,),
           SizedBox(
-            height: 230,
+            height: 130,
             child: ListView.builder(
               itemCount: currentCity.hourlyWeather.length,
               itemBuilder: (context, index) {
                 return _hourlyBox(currentCity.hourlyWeather[index]);
               },
-              // separatorBuilder: (context, index) {
-              //   return VerticalDivider(
-              //     thickness: 3,
-              //     radius: BorderRadius.all(Radius.circular(3)),
-              //     endIndent: 60,
-              //     color: Colors.black,
-              //   );
-              // },
               scrollDirection: Axis.horizontal,
             ),
           )
@@ -219,73 +186,35 @@ class _HomePageState extends State<HomePage> {
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.red
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.memory(
-                        weather.iconBytes,
-                        height: 80,
-                      )
-                      // Image.network(
-                      //   'https://openweathermap.org/img/wn/${weather.iconString}@2x.png',
-                      //   loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                      //     if (loadingProgress == null) {
-                      //       return child;
-                      //     }
-                      //     return Center(
-                      //       child: CircularProgressIndicator(
-                      //         value: loadingProgress.expectedTotalBytes != null
-                      //             ? loadingProgress.cumulativeBytesLoaded /
-                      //                 loadingProgress.expectedTotalBytes!
-                      //             : null,
-                      //       ),
-                      //     );
-                      //   },
-                      //   height: 80,
-                      // ),
-                      ,
-                      Text(
-                        weather.temp.toStringAsFixed(0),
-                        style: TextStyle(
-                          fontSize: 26,
-                        ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.fromLTRB(0, 10, 10, 10),
+                      child: SvgPicture.asset(
+                        'assets/icons/icon-${weather.iconString}.svg',
+                        width: 35,
                       ),
-                      SvgPicture.asset(
-                        'assets/icons/celsius.svg',
-                        height: 22,
-                      )
-                    ],
-                  ),
+                    ),
+                    Text(
+                      weather.temp.toStringAsFixed(0),
+                      style: TextStyle(
+                        fontSize: 26,
+                      ),
+                    ),
+                    SvgPicture.asset(
+                      'assets/icons/celsius.svg',
+                      height: 22,
+                    )
+                  ],
                 ),
                 
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      'Feels Like: '
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          weather.feelsLike.toStringAsFixed(0),
-                          style: TextStyle(
-                            fontSize: 16,
-                            
-                          ),
-                        ),
-                        SvgPicture.asset(
-                          'assets/icons/celsius.svg',
-                          height: 16,
-                        ),
-                      ],
-                    ),
+                    
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -346,28 +275,14 @@ class _HomePageState extends State<HomePage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.memory(
-                weather.iconBytes,
-                height: 80,
-              )
-              // Image.network(
-              //   'https://openweathermap.org/img/wn/${weather.iconString}@2x.png',
-              //   loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-              //     if (loadingProgress == null) {
-              //       return child;
-              //     }
-              //     return Center(
-              //       child: CircularProgressIndicator(
-              //         value: loadingProgress.expectedTotalBytes != null
-              //             ? loadingProgress.cumulativeBytesLoaded /
-              //                 loadingProgress.expectedTotalBytes!
-              //             : null,
-              //       ),
-              //     );
-              //   },
-              //   height: 80,
-              // ),
-              ,
+              Container(
+                padding: EdgeInsets.all(10),
+                margin: EdgeInsets.only(left: 10),
+                child: SvgPicture.asset(
+                  'assets/icons/icon-${weather.iconString}.svg',
+                  width: 50,
+                ),
+              ),
               SizedBox(
                 width: 0,
               ),
