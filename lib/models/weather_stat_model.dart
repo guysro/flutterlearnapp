@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:background_remover/background_remover.dart';
+// import 'package:background_remover/background_remover.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class WeatherStatModel {
@@ -11,7 +12,7 @@ class WeatherStatModel {
   num uvIdx;
   num windSpeed;
   String iconString;
-  late Uint8List iconBytes;
+  Uint8List iconBytes = Uint8List(1);
 
   WeatherStatModel({
     required this.temp,
@@ -68,10 +69,12 @@ class WeatherStatModel {
   }
 
   void getIconBytes() async {
-    http.Response res = await http.get(Uri.parse('https://openweathermap.org/img/wn/$iconString@2x.png'));
-    Uint8List bytes = res.bodyBytes;
-    Uint8List noBgBytes = await removeBackground(imageBytes: bytes);
-    iconBytes = noBgBytes;
+    // http.Response res = await http.get(Uri.parse('https://openweathermap.org/img/wn/$iconString@2x.png'));
+    // print(res.statusCode);
+    // Uint8List bytes = res.bodyBytes;
+    // Uint8List noBgBytes = await removeBackground(imageBytes: bytes);
+    // iconBytes = noBgBytes;
+    // iconBytes = bytes;
   }
   
   @override

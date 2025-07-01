@@ -1,13 +1,13 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
-import 'package:background_remover/background_remover.dart';
 import 'package:flutterllearnapp/models/weather_stat_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutterllearnapp/models/city_model.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:local_rembg/local_rembg.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -71,13 +71,35 @@ class _HomePageState extends State<HomePage> {
     List<WeatherStatModel> hourlyWeather = hourlyWeatherData
       .map((hourlyMap) => WeatherStatModel.fromJSON(hourlyMap as Map<String, dynamic>))
       .toList();
-
+    hourlyWeather = hourlyWeather.sublist(0, 4);
     print(hourlyWeather);
     http.Response locRes = await http.get(Uri.parse("http://api.openweathermap.org/geo/1.0/reverse?lat=$lat&lon=$lng&limit=1&appid=3c1337f474bf021bc368451dfd604fca"));
     
     List<dynamic> locData = jsonDecode(locRes.body);
     print(locData[0]['name']);
     String cityName = limitStringToWords(locData[0]['name'], 2);
+    
+    http.Response icon = await http.get(Uri.parse('https://openweathermap.org/img/wn/${currentWeather.iconString}@2x.png'));
+    Uint8List bytes = icon.bodyBytes;
+    LocalRembgResultModel rembgRes = await LocalRembg.removeBackground(imageUint8List: bytes);
+    if(rembgRes.status == 1){
+      currentWeather.iconBytes = Uint8List.fromList(rembgRes.imageBytes!);
+    }
+    else{
+      currentWeather.iconBytes = bytes;
+    }
+
+    for (var weatherData in hourlyWeather) {
+      http.Response icon = await http.get(Uri.parse('https://openweathermap.org/img/wn/${weatherData.iconString}@2x.png'));
+      Uint8List bytes = icon.bodyBytes;
+      LocalRembgResultModel rembgRes = await LocalRembg.removeBackground(imageUint8List: bytes);
+      if(rembgRes.status == 1){
+        weatherData.iconBytes = Uint8List.fromList(rembgRes.imageBytes!);
+      }
+      else{
+        weatherData.iconBytes = bytes;
+      }
+    }
 
     currentCity = CityModel(
       name: cityName,
@@ -86,6 +108,7 @@ class _HomePageState extends State<HomePage> {
       currentWeather: currentWeather, 
       hourlyWeather: hourlyWeather
     );  
+    
     // print(currentCity.currentWeather.toString());
     setState(() {
       loading = false;
@@ -204,24 +227,28 @@ class _HomePageState extends State<HomePage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Image.network(
-                        'https://openweathermap.org/img/wn/${weather.iconString}@2x.png',
-                        
-                        loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                          if (loadingProgress == null) {
-                            return child;
-                          }
-                          return Center(
-                            child: CircularProgressIndicator(
-                              value: loadingProgress.expectedTotalBytes != null
-                                  ? loadingProgress.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
-                                  : null,
-                            ),
-                          );
-                        },
+                      Image.memory(
+                        weather.iconBytes,
                         height: 80,
-                      ),
+                      )
+                      // Image.network(
+                      //   'https://openweathermap.org/img/wn/${weather.iconString}@2x.png',
+                      //   loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                      //     if (loadingProgress == null) {
+                      //       return child;
+                      //     }
+                      //     return Center(
+                      //       child: CircularProgressIndicator(
+                      //         value: loadingProgress.expectedTotalBytes != null
+                      //             ? loadingProgress.cumulativeBytesLoaded /
+                      //                 loadingProgress.expectedTotalBytes!
+                      //             : null,
+                      //       ),
+                      //     );
+                      //   },
+                      //   height: 80,
+                      // ),
+                      ,
                       Text(
                         weather.temp.toStringAsFixed(0),
                         style: TextStyle(
@@ -296,12 +323,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _getIcon(WeatherStatModel weather) async {
-    http.Response res = await http.get(Uri.parse('https://openweathermap.org/img/wn/${weather.icon}@2x.png'));
-    Uint8List bytes = res.bodyBytes;
-    Uint8List noBgBytes = await removeBackground(imageBytes: bytes);
-  }
-
   Widget _dataBox(WeatherStatModel weather) {
     // from left to right: sky icon, temp, sky 
     return Container(
@@ -325,23 +346,28 @@ class _HomePageState extends State<HomePage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.network(
-                'https://openweathermap.org/img/wn/${weather.icon}@2x.png',
-                loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                  if (loadingProgress == null) {
-                    return child;
-                  }
-                  return Center(
-                    child: CircularProgressIndicator(
-                      value: loadingProgress.expectedTotalBytes != null
-                          ? loadingProgress.cumulativeBytesLoaded /
-                              loadingProgress.expectedTotalBytes!
-                          : null,
-                    ),
-                  );
-                },
+              Image.memory(
+                weather.iconBytes,
                 height: 80,
-              ),
+              )
+              // Image.network(
+              //   'https://openweathermap.org/img/wn/${weather.iconString}@2x.png',
+              //   loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+              //     if (loadingProgress == null) {
+              //       return child;
+              //     }
+              //     return Center(
+              //       child: CircularProgressIndicator(
+              //         value: loadingProgress.expectedTotalBytes != null
+              //             ? loadingProgress.cumulativeBytesLoaded /
+              //                 loadingProgress.expectedTotalBytes!
+              //             : null,
+              //       ),
+              //     );
+              //   },
+              //   height: 80,
+              // ),
+              ,
               SizedBox(
                 width: 0,
               ),
