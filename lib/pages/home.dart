@@ -69,7 +69,8 @@ class _HomePageState extends State<HomePage> {
     List<WeatherStatModel> hourlyWeather = hourlyWeatherData
       .map((hourlyMap) => WeatherStatModel.fromJSON(hourlyMap as Map<String, dynamic>))
       .toList();
-    print(hourlyWeather);
+
+    hourlyWeather = hourlyWeather.sublist(1);    
     http.Response locRes = await http.get(Uri.parse("http://api.openweathermap.org/geo/1.0/reverse?lat=$lat&lon=$lng&limit=1&appid=3c1337f474bf021bc368451dfd604fca"));
     
     List<dynamic> locData = jsonDecode(locRes.body);
