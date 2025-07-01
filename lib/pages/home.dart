@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:background_remover/background_remover.dart';
 import 'package:flutterllearnapp/models/weather_stat_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -56,6 +57,7 @@ class _HomePageState extends State<HomePage> {
     Position currentPosition = await Geolocator.getCurrentPosition();
     
     print(currentPosition.toString());
+    
     double lat = currentPosition.latitude;
     double lng = currentPosition.longitude;
     http.Response res = await http.get(Uri.parse("https://api.openweathermap.org/data/3.0/onecall?lat=$lat&lon=$lng&appid=3c1337f474bf021bc368451dfd604fca&units=metric"));
@@ -70,10 +72,8 @@ class _HomePageState extends State<HomePage> {
       .map((hourlyMap) => WeatherStatModel.fromJSON(hourlyMap as Map<String, dynamic>))
       .toList();
 
-    String timezone = dataJson['timezone'];
-
+    print(hourlyWeather);
     http.Response locRes = await http.get(Uri.parse("http://api.openweathermap.org/geo/1.0/reverse?lat=$lat&lon=$lng&limit=1&appid=3c1337f474bf021bc368451dfd604fca"));
-    
     
     List<dynamic> locData = jsonDecode(locRes.body);
     print(locData[0]['name']);
@@ -112,10 +112,33 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Container _body() {
+  Widget _body() {
     return Container(
-        child:loading ? _loadingCircle() : _dataBox(currentCity.currentWeather)
-      );
+      child: loading ? _loadingCircle() : Column(
+        children: [
+          _dataBox(currentCity.currentWeather),
+          SizedBox(height: 100,),
+          SizedBox(
+            height: 230,
+            child: ListView.builder(
+              itemCount: currentCity.hourlyWeather.length,
+              itemBuilder: (context, index) {
+                return _hourlyBox(currentCity.hourlyWeather[index]);
+              },
+              // separatorBuilder: (context, index) {
+              //   return VerticalDivider(
+              //     thickness: 3,
+              //     radius: BorderRadius.all(Radius.circular(3)),
+              //     endIndent: 60,
+              //     color: Colors.black,
+              //   );
+              // },
+              scrollDirection: Axis.horizontal,
+            ),
+          )
+        ],
+      ),
+    );
   }
 
   Widget _loadingCircle() {
@@ -139,10 +162,149 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _hourlyBox(WeatherStatModel weather){
+    return Container(
+      decoration: BoxDecoration(
+        border: BoxBorder.all(
+          color: Colors.black,
+          width: 2,
+        )
+      ),
+      child: Column(
+        children: [
+          Text(
+            "${weather.time.hour}:${weather.time.minute >= 10 ? weather.time.minute : "0${weather.time.minute}"}",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 15),
+            decoration: BoxDecoration(
+              color: Color.fromARGB(33, 255, 255, 255),
+              boxShadow: [
+                BoxShadow(
+                  color: Color.fromRGBO(29,22,23,0.11),
+                  blurRadius: 40,
+                  spreadRadius: 10
+                )
+              ],
+            ),
+            clipBehavior: Clip.none,
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.red
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.network(
+                        'https://openweathermap.org/img/wn/${weather.iconString}@2x.png',
+                        
+                        loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                          if (loadingProgress == null) {
+                            return child;
+                          }
+                          return Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                            ),
+                          );
+                        },
+                        height: 80,
+                      ),
+                      Text(
+                        weather.temp.toStringAsFixed(0),
+                        style: TextStyle(
+                          fontSize: 26,
+                        ),
+                      ),
+                      SvgPicture.asset(
+                        'assets/icons/celsius.svg',
+                        height: 22,
+                      )
+                    ],
+                  ),
+                ),
+                
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Feels Like: '
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          weather.feelsLike.toStringAsFixed(0),
+                          style: TextStyle(
+                            fontSize: 16,
+                            
+                          ),
+                        ),
+                        SvgPicture.asset(
+                          'assets/icons/celsius.svg',
+                          height: 16,
+                        ),
+                      ],
+                    ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SvgPicture.asset(
+                          'assets/icons/wind.svg',
+                          height: 20,
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          weather.windSpeed.toStringAsFixed(1),
+                          style: TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
+                        Text(
+                          'km/h',
+                          style: TextStyle(
+                            fontSize: 12,
+                          
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+                // Text(weatherTime())
+              ],
+            )
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _getIcon(WeatherStatModel weather) async {
+    http.Response res = await http.get(Uri.parse('https://openweathermap.org/img/wn/${weather.icon}@2x.png'));
+    Uint8List bytes = res.bodyBytes;
+    Uint8List noBgBytes = await removeBackground(imageBytes: bytes);
+  }
+
   Widget _dataBox(WeatherStatModel weather) {
     // from left to right: sky icon, temp, sky 
     return Container(
-      padding: EdgeInsets.only(left: 15),
       decoration: BoxDecoration(
         color: Color.fromARGB(33, 255, 255, 255),
         boxShadow: [
@@ -186,7 +348,8 @@ class _HomePageState extends State<HomePage> {
               Text(
                 weather.temp.toStringAsFixed(0),
                 style: TextStyle(
-                  fontSize: 36
+                  fontSize: 36,
+                  fontWeight: FontWeight.bold
                 ),
               ),
               SvgPicture.asset(
@@ -196,7 +359,6 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
           
-          // Text("${weather.windSpeed}"),
           Container(
             padding: EdgeInsets.only(top: 10, right: 10),
             child: Column(
@@ -254,9 +416,9 @@ class _HomePageState extends State<HomePage> {
         ],
       )
     );
-
   }
 
+  // ignore: unused_element
   Container _searchField() {
     return Container();
     // return Container(
