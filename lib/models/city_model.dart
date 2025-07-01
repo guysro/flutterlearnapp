@@ -27,13 +27,6 @@ class CityModel {
     );
   }
 
-  void fetchIcons(){
-    for (var data in hourlyWeather) {
-      data.getIconBytes();
-    }
-    currentWeather.getIconBytes();
-  }
-
   void fetchWeatherData(double lat, double lng) async {
     http.Response res = await http.get(Uri.parse("https://api.openweathermap.org/data/3.0/onecall?lat=$lat&lon=$lng&appid=3c1337f474bf021bc368451dfd604fca&units=metric"));
 
