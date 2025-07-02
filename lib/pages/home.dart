@@ -129,95 +129,97 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _body() {
-    return SingleChildScrollView(
+    return Container(
       padding: EdgeInsets.only(bottom: 20),
-      child: loading ? _loadingCircle() : Column(
-        children: [
-          _dataBox(currentCity.currentWeather),
-          SizedBox(height: 30,),
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: 15),
-            child: SizedBox(
-              height: 115,
-              child: 
-                Container(
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        color: Color.fromRGBO(29,22,23,0.11),
-                        blurRadius: 40,
-                        spreadRadius: 10
-                      )
-                    ],
-                    border: BoxBorder.all(
-                      color: Colors.black,
-                      width: 1
+      child: loading ? _loadingCircle() : SingleChildScrollView(
+        child: Column(
+          children: [
+            _dataBox(currentCity.currentWeather),
+            SizedBox(height: 30,),
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 15),
+              child: SizedBox(
+                height: 115,
+                child: 
+                  Container(
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color.fromRGBO(29,22,23,0.11),
+                          blurRadius: 40,
+                          spreadRadius: 10
+                        )
+                      ],
+                      border: BoxBorder.all(
+                        color: Colors.black,
+                        width: 1
+                      ),
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      color: Color.fromARGB(33, 255, 255, 255),
                     ),
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                    color: Color.fromARGB(33, 255, 255, 255),
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  child: ListView.separated(
-                    padding: EdgeInsets.all(0),
-                    itemCount: currentCity.hourlyWeather.length,
-                    itemBuilder: (context, index) {
-                      return _hourlyBox(currentCity.hourlyWeather[index]);
-                    },
-                    scrollDirection: Axis.horizontal,
-                    separatorBuilder: (context, index) {
-                      return VerticalDivider(color: Colors.black, thickness: 1,width: 0,);
-                    },
-                    physics: PageScrollPhysics(),
-                  ),
-                ),
-            ),
-          ),
-          SizedBox(height: 30),
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: 15),
-            child: SizedBox(
-              height: 400,
-              child: 
-                Container(
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        color: Color.fromRGBO(29,22,23,0.11),
-                        blurRadius: 40,
-                        spreadRadius: 10
-                      )
-                    ],
-                    border: BoxBorder.all(
-                      color: Colors.black,
-                      width: 1,
+                    clipBehavior: Clip.antiAlias,
+                    child: ListView.separated(
+                      padding: EdgeInsets.all(0),
+                      itemCount: currentCity.hourlyWeather.length,
+                      itemBuilder: (context, index) {
+                        return _hourlyBox(currentCity.hourlyWeather[index]);
+                      },
+                      scrollDirection: Axis.horizontal,
+                      separatorBuilder: (context, index) {
+                        return VerticalDivider(color: Colors.black, thickness: 1,width: 0,);
+                      },
+                      physics: PageScrollPhysics(),
                     ),
-                    borderRadius: BorderRadius.all(Radius.circular(10))
                   ),
-                  clipBehavior: Clip.antiAlias,
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    padding: EdgeInsets.all(0),
-                    itemCount: currentCity.dailyWeather.length,
-                    itemBuilder: (context, index) {
-                      return _dailyBox(currentCity.dailyWeather[index]);
-                    },
-                    separatorBuilder: (context, index) {
-                        return Divider(color: Colors.black, thickness: 1,height: 0,);
-                    },
-                    physics: NeverScrollableScrollPhysics(),
-                  ),
-                ),
+              ),
             ),
-          )
-        ],
+            SizedBox(height: 30),
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 15),
+              child: SizedBox(
+                height: 400,
+                child: 
+                  Container(
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color.fromRGBO(29,22,23,0.11),
+                          blurRadius: 40,
+                          spreadRadius: 10
+                        )
+                      ],
+                      border: BoxBorder.all(
+                        color: Colors.black,
+                        width: 1,
+                      ),
+                      borderRadius: BorderRadius.all(Radius.circular(10))
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      padding: EdgeInsets.all(0),
+                      itemCount: currentCity.dailyWeather.length,
+                      itemBuilder: (context, index) {
+                        return _dailyBox(currentCity.dailyWeather[index]);
+                      },
+                      separatorBuilder: (context, index) {
+                          return Divider(color: Colors.black, thickness: 1,height: 0,);
+                      },
+                      physics: NeverScrollableScrollPhysics(),
+                    ),
+                  ),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
 
   Widget _loadingCircle() {
-
     return Container(
       alignment: Alignment.center,
+      transformAlignment: Alignment.center,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
