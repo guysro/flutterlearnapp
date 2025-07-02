@@ -70,7 +70,7 @@ class _HomePageState extends State<HomePage> {
       .map((hourlyMap) => WeatherStatModel.fromJSON(hourlyMap as Map<String, dynamic>))
       .toList();
 
-    hourlyWeather = hourlyWeather.sublist(1);    
+    hourlyWeather = hourlyWeather.sublist(1, 24);    
     http.Response locRes = await http.get(Uri.parse("http://api.openweathermap.org/geo/1.0/reverse?lat=$lat&lon=$lng&limit=1&appid=3c1337f474bf021bc368451dfd604fca"));
     
     List<dynamic> locData = jsonDecode(locRes.body);
@@ -116,16 +116,17 @@ class _HomePageState extends State<HomePage> {
       child: loading ? _loadingCircle() : Column(
         children: [
           _dataBox(currentCity.currentWeather),
-          SizedBox(height: 100,),
+          SizedBox(height: 60,),
           SizedBox(
-            height: 130,
-            child: ListView.builder(
-              itemCount: currentCity.hourlyWeather.length,
-              itemBuilder: (context, index) {
-                return _hourlyBox(currentCity.hourlyWeather[index]);
-              },
-              scrollDirection: Axis.horizontal,
-            ),
+            height: 115,
+            child: 
+              ListView.builder(
+                itemCount: currentCity.hourlyWeather.length,
+                itemBuilder: (context, index) {
+                  return _hourlyBox(currentCity.hourlyWeather[index]);
+                },
+                scrollDirection: Axis.horizontal,
+              ),
           )
         ],
       ),
@@ -153,6 +154,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+
   Widget _hourlyBox(WeatherStatModel weather){
     return Container(
       decoration: BoxDecoration(
@@ -171,6 +173,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           Container(
+
             padding: EdgeInsets.symmetric(horizontal: 15),
             decoration: BoxDecoration(
               color: Color.fromARGB(33, 255, 255, 255),
@@ -186,65 +189,32 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              spacing: 10,
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.fromLTRB(0, 10, 10, 10),
-                      child: SvgPicture.asset(
-                        'assets/icons/icon-${weather.iconString}.svg',
-                        width: 35,
-                      ),
-                    ),
-                    Text(
-                      weather.temp.toStringAsFixed(0),
-                      style: TextStyle(
-                        fontSize: 26,
-                      ),
-                    ),
-                    SvgPicture.asset(
-                      'assets/icons/celsius.svg',
-                      height: 22,
-                    )
-                  ],
-                ),
-                
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    
+                    SvgPicture.asset(
+                      'assets/icons/icon-${weather.iconString}.svg',
+                      width: 35,
+                    ),
                     Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        Text(
+                          weather.temp.toStringAsFixed(0),
+                          style: TextStyle(
+                            fontSize: 26,
+                          ),
+                        ),
                         SvgPicture.asset(
-                          'assets/icons/wind.svg',
-                          height: 20,
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Text(
-                          weather.windSpeed.toStringAsFixed(1),
-                          style: TextStyle(
-                            fontSize: 16,
-                          ),
-                        ),
-                        Text(
-                          'km/h',
-                          style: TextStyle(
-                            fontSize: 12,
-                          
-                          ),
+                          'assets/icons/celsius.svg',
+                          height: 22,
                         ),
                       ],
                     )
                   ],
                 ),
-                // Text(weatherTime())
               ],
             )
           ),
