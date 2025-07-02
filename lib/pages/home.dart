@@ -239,7 +239,6 @@ class _HomePageState extends State<HomePage> {
 
   Widget _dailyBox(DailyModel weather){
     return Container(
-      // color: Colors.red,
       padding: EdgeInsets.all(10),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -261,19 +260,18 @@ class _HomePageState extends State<HomePage> {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 15),
             clipBehavior: Clip.none,
-            // color: Colors.tealAccent,
+            alignment: Alignment.centerRight,
             child: Row(
               spacing: 25,
               crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.start,
-              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 SvgPicture.asset(
                   'assets/icons/icon-${weather.iconString}.svg',
                   width: 28,
                 ),
+                
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     SvgPicture.asset(
                       'assets/icons/up.svg',
@@ -292,7 +290,6 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     SvgPicture.asset(
                       'assets/icons/down.svg',
