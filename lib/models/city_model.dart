@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutterllearnapp/models/daily_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutterllearnapp/models/weather_stat_model.dart';
 
@@ -6,15 +7,17 @@ class CityModel {
   String name;
   double lat;
   double lng;
-  late WeatherStatModel currentWeather;
-  late List<WeatherStatModel> hourlyWeather;
+  WeatherStatModel currentWeather;
+  List<WeatherStatModel> hourlyWeather;
+  List<DailyModel> dailyWeather;
 
   CityModel({
     required this.name,
     required this.lat,
     required this.lng,
     required this.currentWeather,
-    required this.hourlyWeather
+    required this.hourlyWeather,
+    required this.dailyWeather
   });
 
   factory CityModel.defaultCity(){
@@ -23,7 +26,8 @@ class CityModel {
       lat: 51.5073219, 
       lng: -0.1276474, 
       currentWeather: WeatherStatModel.empty(),
-      hourlyWeather: List.empty()
+      hourlyWeather: List.empty(),
+      dailyWeather: List.empty()
     );
   }
 

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutterllearnapp/models/daily_model.dart';
 import 'package:flutterllearnapp/models/weather_stat_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -18,6 +19,16 @@ class _HomePageState extends State<HomePage> {
   bool loading = true;
   CityModel currentCity = CityModel.defaultCity();
   
+  final List<String> days = List.of([
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday"
+  ]);
+
   String limitStringToWords(String text, int wordLimit) {
     if (wordLimit <= 0) {
       return '';
@@ -70,6 +81,11 @@ class _HomePageState extends State<HomePage> {
       .map((hourlyMap) => WeatherStatModel.fromJSON(hourlyMap as Map<String, dynamic>))
       .toList();
 
+    List<dynamic> dailyWeatherData = dataJson['daily'];
+    List<DailyModel> dailyWeather = dailyWeatherData
+      .map((dayMap) => DailyModel.fromJSON(dayMap as Map<String, dynamic>))
+      .toList();
+
     hourlyWeather = hourlyWeather.sublist(1, 24);    
     http.Response locRes = await http.get(Uri.parse("http://api.openweathermap.org/geo/1.0/reverse?lat=$lat&lon=$lng&limit=1&appid=3c1337f474bf021bc368451dfd604fca"));
     
@@ -82,7 +98,8 @@ class _HomePageState extends State<HomePage> {
       lat: currentPosition.latitude, 
       lng: currentPosition.longitude, 
       currentWeather: currentWeather, 
-      hourlyWeather: hourlyWeather
+      hourlyWeather: hourlyWeather,
+      dailyWeather: dailyWeather
     );  
     
     // print(currentCity.currentWeather.toString());
@@ -112,21 +129,85 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _body() {
-    return Container(
+    return SingleChildScrollView(
+      padding: EdgeInsets.only(bottom: 20),
       child: loading ? _loadingCircle() : Column(
         children: [
           _dataBox(currentCity.currentWeather),
-          SizedBox(height: 60,),
-          SizedBox(
-            height: 115,
-            child: 
-              ListView.builder(
-                itemCount: currentCity.hourlyWeather.length,
-                itemBuilder: (context, index) {
-                  return _hourlyBox(currentCity.hourlyWeather[index]);
-                },
-                scrollDirection: Axis.horizontal,
-              ),
+          SizedBox(height: 30,),
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: 15),
+            child: SizedBox(
+              height: 115,
+              child: 
+                Container(
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color.fromRGBO(29,22,23,0.11),
+                        blurRadius: 40,
+                        spreadRadius: 10
+                      )
+                    ],
+                    border: BoxBorder.all(
+                      color: Colors.black,
+                      width: 1
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    color: Color.fromARGB(33, 255, 255, 255),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: ListView.separated(
+                    padding: EdgeInsets.all(0),
+                    itemCount: currentCity.hourlyWeather.length,
+                    itemBuilder: (context, index) {
+                      return _hourlyBox(currentCity.hourlyWeather[index]);
+                    },
+                    scrollDirection: Axis.horizontal,
+                    separatorBuilder: (context, index) {
+                      return VerticalDivider(color: Colors.black, thickness: 1,width: 0,);
+                    },
+                    physics: PageScrollPhysics(),
+                  ),
+                ),
+            ),
+          ),
+          SizedBox(height: 30),
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: 15),
+            child: SizedBox(
+              height: 400,
+              child: 
+                Container(
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color.fromRGBO(29,22,23,0.11),
+                        blurRadius: 40,
+                        spreadRadius: 10
+                      )
+                    ],
+                    border: BoxBorder.all(
+                      color: Colors.black,
+                      width: 1,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(10))
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    padding: EdgeInsets.all(0),
+                    itemCount: currentCity.dailyWeather.length,
+                    itemBuilder: (context, index) {
+                      return _dailyBox(currentCity.dailyWeather[index]);
+                    },
+                    separatorBuilder: (context, index) {
+                        return Divider(color: Colors.black, thickness: 1,height: 0,);
+                    },
+                    physics: NeverScrollableScrollPhysics(),
+                  ),
+                ),
+            ),
           )
         ],
       ),
@@ -154,72 +235,135 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-
-  Widget _hourlyBox(WeatherStatModel weather){
+  Widget _dailyBox(DailyModel weather){
     return Container(
-      decoration: BoxDecoration(
-        border: BoxBorder.all(
-          color: Colors.black,
-          width: 2,
-        )
-      ),
-      child: Column(
+      // color: Colors.red,
+      padding: EdgeInsets.all(10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Text(
-            "${weather.time.hour}:${weather.time.minute >= 10 ? weather.time.minute : "0${weather.time.minute}"}",
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold
+          SizedBox(
+            width: 110,
+            child: Text(
+              days[weather.dateTime.weekday - 1],
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold
+              ),
             ),
           ),
+          SizedBox(
+            width: 10,
+          ),
           Container(
-
             padding: EdgeInsets.symmetric(horizontal: 15),
-            decoration: BoxDecoration(
-              color: Color.fromARGB(33, 255, 255, 255),
-              boxShadow: [
-                BoxShadow(
-                  color: Color.fromRGBO(29,22,23,0.11),
-                  blurRadius: 40,
-                  spreadRadius: 10
-                )
-              ],
-            ),
             clipBehavior: Clip.none,
-            child: Column(
+            // color: Colors.tealAccent,
+            child: Row(
+              spacing: 25,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              spacing: 10,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
+                SvgPicture.asset(
+                  'assets/icons/icon-${weather.iconString}.svg',
+                  width: 28,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     SvgPicture.asset(
-                      'assets/icons/icon-${weather.iconString}.svg',
-                      width: 35,
+                      'assets/icons/up.svg',
+                      height: 18,
                     ),
-                    Row(
-                      children: [
-                        Text(
-                          weather.temp.toStringAsFixed(0),
-                          style: TextStyle(
-                            fontSize: 26,
-                          ),
-                        ),
-                        SvgPicture.asset(
-                          'assets/icons/celsius.svg',
-                          height: 22,
-                        ),
-                      ],
-                    )
+                    Text(
+                      weather.maxDeg.toStringAsFixed(0),
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                    SvgPicture.asset(
+                      'assets/icons/celsius.svg',
+                      height: 18,
+                    ),
                   ],
                 ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/down.svg',
+                      height: 18,
+                    ),
+                    Text(
+                      weather.minDeg.toStringAsFixed(0),
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                    SvgPicture.asset(
+                      'assets/icons/celsius.svg',
+                      height: 18,
+                    ),
+                  ],
+                )
               ],
             )
           ),
+          
         ],
       ),
+    );
+  }
+
+  Widget _hourlyBox(WeatherStatModel weather){
+    return Column(
+      children: [
+        Text(
+          "${weather.time.hour}:${weather.time.minute >= 10 ? weather.time.minute : "0${weather.time.minute}"}",
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold
+          ),
+        ),
+        Container(
+    
+          padding: EdgeInsets.symmetric(horizontal: 15),
+          clipBehavior: Clip.none,
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            spacing: 10,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SvgPicture.asset(
+                    'assets/icons/icon-${weather.iconString}.svg',
+                    width: 35,
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        weather.temp.toStringAsFixed(0),
+                        style: TextStyle(
+                          fontSize: 26,
+                        ),
+                      ),
+                      SvgPicture.asset(
+                        'assets/icons/celsius.svg',
+                        height: 22,
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ],
+          )
+        ),
+      ],
     );
   }
 
