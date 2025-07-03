@@ -106,7 +106,7 @@ class _HomePageState extends State<HomePage> {
                   shrinkWrap: true,
                   itemCount: listOfLocation.length,
                   itemBuilder: (context, index) {
-                    return GestureDetector(
+                    return InkWell(
                       onTap: () async {
                         searchControler.text =
                             listOfLocation[index]['description'];
