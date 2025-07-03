@@ -33,58 +33,60 @@ class DailyBox extends StatelessWidget {
           SizedBox(
             width: 10,
           ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 15),
-            clipBehavior: Clip.none,
-            alignment: Alignment.centerRight,
-            child: Row(
-              spacing: 25,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                SvgPicture.asset(
-                  'assets/icons/icon-${weather.iconString}.svg',
-                  width: 28,
-                ),
-                
-                Row(
-                  children: [
-                    SvgPicture.asset(
-                      'assets/icons/up.svg',
-                      height: 18,
-                    ),
-                    Text(
-                      weather.maxDeg.toStringAsFixed(0),
-                      style: TextStyle(
-                        fontSize: 18,
+          Expanded(
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 15),
+              clipBehavior: Clip.none,
+              alignment: Alignment.centerRight,
+              child: Row(
+                spacing: 25,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SvgPicture.asset(
+                    'assets/icons/icon-${weather.iconString}.svg',
+                    width: 28,
+                  ),
+                  
+                  Row(
+                    children: [
+                      SvgPicture.asset(
+                        'assets/icons/up.svg',
+                        height: 18,
                       ),
-                    ),
-                    SvgPicture.asset(
-                      'assets/icons/celsius.svg',
-                      height: 18,
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    SvgPicture.asset(
-                      'assets/icons/down.svg',
-                      height: 18,
-                    ),
-                    Text(
-                      weather.minDeg.toStringAsFixed(0),
-                      style: TextStyle(
-                        fontSize: 18,
+                      Text(
+                        weather.maxDeg.toStringAsFixed(0),
+                        style: TextStyle(
+                          fontSize: 18,
+                        ),
                       ),
-                    ),
-                    SvgPicture.asset(
-                      'assets/icons/celsius.svg',
-                      height: 18,
-                    ),
-                  ],
-                )
-              ],
-            )
+                      SvgPicture.asset(
+                        'assets/icons/celsius.svg',
+                        height: 18,
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      SvgPicture.asset(
+                        'assets/icons/down.svg',
+                        height: 18,
+                      ),
+                      Text(
+                        weather.minDeg.toStringAsFixed(0),
+                        style: TextStyle(
+                          fontSize: 18,
+                        ),
+                      ),
+                      SvgPicture.asset(
+                        'assets/icons/celsius.svg',
+                        height: 18,
+                      ),
+                    ],
+                  )
+                ],
+              )
+            ),
           ),
           
         ],

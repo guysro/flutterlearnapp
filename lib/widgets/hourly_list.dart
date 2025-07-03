@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutterllearnapp/models/city_model.dart';
+import 'package:flutterllearnapp/models/weather_stat_model.dart';
 import 'package:flutterllearnapp/widgets/hourly_box.dart';
 
 class HourlyList extends StatelessWidget {
   const HourlyList({
     super.key,
-    required this.currentCity,
+    required this.hourlyWeather,
   });
 
-  final CityModel currentCity;
+  final List<WeatherStatModel> hourlyWeather;
 
   @override
   Widget build(BuildContext context) {
@@ -36,9 +36,9 @@ class HourlyList extends StatelessWidget {
             clipBehavior: Clip.antiAlias,
             child: ListView.separated(
               padding: EdgeInsets.all(0),
-              itemCount: currentCity.hourlyWeather.length,
+              itemCount: hourlyWeather.length,
               itemBuilder: (context, index) {
-                return HourlyBox(weather: currentCity.hourlyWeather[index]);
+                return HourlyBox(weather: hourlyWeather[index]);
               },
               scrollDirection: Axis.horizontal,
               separatorBuilder: (context, index) {

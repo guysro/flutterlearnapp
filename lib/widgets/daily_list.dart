@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutterllearnapp/models/city_model.dart';
+import 'package:flutterllearnapp/models/daily_model.dart';
 import 'package:flutterllearnapp/widgets/daily_box.dart';
 
 class DailyList extends StatelessWidget {
   const DailyList({
     super.key,
-    required this.currentCity,
+    required this.dailyWeather,
     required this.days,
   });
 
-  final CityModel currentCity;
+  final List<DailyModel> dailyWeather;
   final List<String> days;
 
   @override
@@ -38,9 +38,9 @@ class DailyList extends StatelessWidget {
             child: ListView.separated(
               shrinkWrap: true,
               padding: EdgeInsets.all(0),
-              itemCount: currentCity.dailyWeather.length,
+              itemCount: dailyWeather.length,
               itemBuilder: (context, index) {
-                return DailyBox(days: days, weather: currentCity.dailyWeather[index]);
+                return DailyBox(days: days, weather: dailyWeather[index]);
               },
               separatorBuilder: (context, index) {
                   return Divider(color: Colors.black, thickness: 1,height: 0,);

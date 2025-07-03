@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterllearnapp/pages/home.dart';
+import 'package:flutterllearnapp/pages/weather_view.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,6 +16,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(fontFamily: 'Poppins'),
       home: HomePage(),
+      // home: WeatherViewPage(),
     );
   }
 }
