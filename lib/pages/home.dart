@@ -84,6 +84,8 @@ class _HomePageState extends State<HomePage> {
                   itemBuilder: (context,index){
                     return GestureDetector(
                       onTap: () {
+                        // TODO: geocode selected text and transfer to weather view
+                        searchControler.text = listOfLocation[index]['description'];
                       },
                       child: ListTile(
                         title: Text(
@@ -100,7 +102,9 @@ class _HomePageState extends State<HomePage> {
               child: Container(
                 margin: EdgeInsets.only(top: 20),
                 child: ElevatedButton(
-                  onPressed: (){}, 
+                  onPressed: (){
+                    // TODO: get current location and transfer to weather view
+                  }, 
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
