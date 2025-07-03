@@ -3,11 +3,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutterllearnapp/models/daily_model.dart';
 
 class DailyBox extends StatelessWidget {
-  const DailyBox({super.key, required this.days, required this.weather});
+  const DailyBox({super.key, required this.days, required this.weather, required this.isToday});
 
   final List<String> days;
   final DailyModel weather;
-
+  final bool isToday;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -19,7 +19,7 @@ class DailyBox extends StatelessWidget {
           SizedBox(
             width: 110,
             child: Text(
-              days[weather.dateTime.weekday - 1],
+              isToday ? 'Today' : days[weather.dateTime.weekday - 1],
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             ),
           ),

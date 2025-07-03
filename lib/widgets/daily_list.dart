@@ -32,7 +32,7 @@ class DailyList extends StatelessWidget {
             padding: EdgeInsets.all(0),
             itemCount: dailyWeather.length,
             itemBuilder: (context, index) {
-              return DailyBox(days: days, weather: dailyWeather[index]);
+              return DailyBox(days: days, weather: dailyWeather[index], isToday: index == 0);
             },
             separatorBuilder: (context, index) {
               return Divider(color: Colors.black, thickness: 1, height: 0);
