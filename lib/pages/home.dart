@@ -73,7 +73,7 @@ class _HomePageState extends State<HomePage> {
     return Padding(
       padding: EdgeInsets.all(20),
       child: Container(
-        padding: EdgeInsets.only(bottom: 100),
+        padding: EdgeInsets.symmetric(vertical: 40),
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
@@ -84,18 +84,37 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            TextField(
-              controller: searchControler,
-              style: TextStyle(fontSize: 20),
-              decoration: InputDecoration(
-                hint: Text("Search", style: TextStyle(fontSize: 20)),
-              ),
-              onChanged: (value) {
-                setState(() {});
-              },
+            Row(
+              children: [
+                Flexible(
+                  child: TextField(
+                    controller: searchControler,
+                    style: TextStyle(fontSize: 20),
+                    decoration: InputDecoration(
+                      hint: Text("Search Location", style: TextStyle(fontSize: 20)),
+                    ),
+                    onChanged: (value) {
+                      setState(() {});
+                    },
+                  ),
+                ),
+                InkWell(
+                  
+                  borderRadius: BorderRadius.circular(25),
+                  onTap: () {
+                    setState(() {
+                      searchControler.text = '';
+                    });
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Icon(Icons.close, size: 30,),
+                  ),
+                )
+              ],
             ),
             Flexible(
               child: Visibility(
