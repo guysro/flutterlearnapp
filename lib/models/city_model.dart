@@ -17,22 +17,26 @@ class CityModel {
     required this.lng,
     required this.currentWeather,
     required this.hourlyWeather,
-    required this.dailyWeather
+    required this.dailyWeather,
   });
 
-  factory CityModel.defaultCity(){
+  factory CityModel.defaultCity() {
     return CityModel(
-      name: "", 
-      lat: 51.5073219, 
-      lng: -0.1276474, 
+      name: "",
+      lat: 51.5073219,
+      lng: -0.1276474,
       currentWeather: WeatherStatModel.empty(),
       hourlyWeather: List.empty(),
-      dailyWeather: List.empty()
+      dailyWeather: List.empty(),
     );
   }
 
   void fetchWeatherData(double lat, double lng) async {
-    http.Response res = await http.get(Uri.parse("https://api.openweathermap.org/data/3.0/onecall?lat=$lat&lon=$lng&appid=3c1337f474bf021bc368451dfd604fca&units=metric"));
+    http.Response res = await http.get(
+      Uri.parse(
+        "https://api.openweathermap.org/data/3.0/onecall?lat=$lat&lon=$lng&appid=3c1337f474bf021bc368451dfd604fca&units=metric",
+      ),
+    );
 
     Map<String, dynamic> dataJson = jsonDecode(res.body);
 
@@ -41,8 +45,11 @@ class CityModel {
 
     List<dynamic> hourlyWeatherData = dataJson['hourly'];
     hourlyWeatherData = hourlyWeatherData
-      .map((hourlyMap) => WeatherStatModel.fromJSON(hourlyMap as Map<String, dynamic>))
-      .toList();
+        .map(
+          (hourlyMap) =>
+              WeatherStatModel.fromJSON(hourlyMap as Map<String, dynamic>),
+        )
+        .toList();
   }
 
   String currentWeatherTime() {

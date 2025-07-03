@@ -3,25 +3,22 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutterllearnapp/models/weather_stat_model.dart';
 
 class DataBox extends StatelessWidget {
-  const DataBox({
-    super.key,
-    required this.weather,
-  });
+  const DataBox({super.key, required this.weather});
 
   final WeatherStatModel weather;
 
   @override
   Widget build(BuildContext context) {
-    // from left to right: sky icon, temp, sky 
+    // from left to right: sky icon, temp, sky
     return Container(
       decoration: BoxDecoration(
         color: Color.fromARGB(33, 255, 255, 255),
         boxShadow: [
           BoxShadow(
-            color: Color.fromRGBO(29,22,23,0.11),
+            color: Color.fromRGBO(29, 22, 23, 0.11),
             blurRadius: 40,
-            spreadRadius: 10
-          )
+            spreadRadius: 10,
+          ),
         ],
       ),
       height: 100,
@@ -42,23 +39,15 @@ class DataBox extends StatelessWidget {
                   width: 50,
                 ),
               ),
-              SizedBox(
-                width: 0,
-              ),
+              SizedBox(width: 0),
               Text(
                 weather.temp.toStringAsFixed(0),
-                style: TextStyle(
-                  fontSize: 36,
-                  fontWeight: FontWeight.bold
-                ),
+                style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
               ),
-              SvgPicture.asset(
-                'assets/icons/celsius.svg',
-                height: 36,
-              )
+              SvgPicture.asset('assets/icons/celsius.svg', height: 36),
             ],
           ),
-          
+
           Container(
             padding: EdgeInsets.only(top: 10, right: 10),
             child: Column(
@@ -66,55 +55,34 @@ class DataBox extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Text(
-                  'Feels Like: '
-                ),
+                Text('Feels Like: '),
                 Row(
                   children: [
                     Text(
                       weather.feelsLike.toStringAsFixed(0),
-                      style: TextStyle(
-                        fontSize: 22,
-                        
-                      ),
+                      style: TextStyle(fontSize: 22),
                     ),
-                    SvgPicture.asset(
-                      'assets/icons/celsius.svg',
-                      height: 22,
-                    ),
+                    SvgPicture.asset('assets/icons/celsius.svg', height: 22),
                   ],
                 ),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    SvgPicture.asset(
-                      'assets/icons/wind.svg',
-                      height: 28,
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
+                    SvgPicture.asset('assets/icons/wind.svg', height: 28),
+                    SizedBox(width: 10),
                     Text(
                       weather.windSpeed.toStringAsFixed(1),
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
+                      style: TextStyle(fontSize: 16),
                     ),
-                    Text(
-                      'km/h',
-                      style: TextStyle(
-                        fontSize: 12,
-
-                      ),
-                    ),
+                    Text('km/h', style: TextStyle(fontSize: 12)),
                   ],
-                )
+                ),
               ],
             ),
           ),
           // Text(weatherTime())
         ],
-      )
+      ),
     );
   }
 }

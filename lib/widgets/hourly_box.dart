@@ -3,10 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutterllearnapp/models/weather_stat_model.dart';
 
 class HourlyBox extends StatelessWidget {
-  const HourlyBox({
-    super.key,
-    required this.weather,
-  });
+  const HourlyBox({super.key, required this.weather});
 
   final WeatherStatModel weather;
 
@@ -16,13 +13,9 @@ class HourlyBox extends StatelessWidget {
       children: [
         Text(
           "${weather.time.hour}:${weather.time.minute >= 10 ? weather.time.minute : "0${weather.time.minute}"}",
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold
-          ),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         Container(
-    
           padding: EdgeInsets.symmetric(horizontal: 15),
           clipBehavior: Clip.none,
           child: Column(
@@ -42,20 +35,15 @@ class HourlyBox extends StatelessWidget {
                     children: [
                       Text(
                         weather.temp.toStringAsFixed(0),
-                        style: TextStyle(
-                          fontSize: 26,
-                        ),
+                        style: TextStyle(fontSize: 26),
                       ),
-                      SvgPicture.asset(
-                        'assets/icons/celsius.svg',
-                        height: 22,
-                      ),
+                      SvgPicture.asset('assets/icons/celsius.svg', height: 22),
                     ],
-                  )
+                  ),
                 ],
               ),
             ],
-          )
+          ),
         ),
       ],
     );

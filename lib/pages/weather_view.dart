@@ -15,11 +15,7 @@ class WeatherViewPage extends StatefulWidget {
   final double lat;
   final double lng;
 
-  const WeatherViewPage({
-    super.key,
-    required this.lat,
-    required this.lng
-  });
+  const WeatherViewPage({super.key, required this.lat, required this.lng});
 
   @override
   State<WeatherViewPage> createState() => _WeatherViewPageState();
@@ -29,7 +25,7 @@ class _WeatherViewPageState extends State<WeatherViewPage> {
   bool loading = true;
   bool defaultView = true;
   CityModel currentCity = CityModel.defaultCity();
-  
+
   final List<String> days = List.of([
     "Monday",
     "Tuesday",
@@ -37,14 +33,17 @@ class _WeatherViewPageState extends State<WeatherViewPage> {
     "Thursday",
     "Friday",
     "Saturday",
-    "Sunday"
+    "Sunday",
   ]);
 
   String limitStringToWords(String text, int wordLimit) {
     if (wordLimit <= 0) {
       return '';
     }
-    List<String> words = text.split(RegExp(r'\s+')).where((s) => s.isNotEmpty).toList();
+    List<String> words = text
+        .split(RegExp(r'\s+'))
+        .where((s) => s.isNotEmpty)
+        .toList();
     if (words.length <= wordLimit) {
       return text.trim();
     }
@@ -56,8 +55,12 @@ class _WeatherViewPageState extends State<WeatherViewPage> {
     setState(() {
       loading = true;
     });
-    
-    http.Response res = await http.get(Uri.parse("https://api.openweathermap.org/data/3.0/onecall?lat=${widget.lat}&lon=${widget.lng}&appid=3c1337f474bf021bc368451dfd604fca&units=metric&exclude=minutely,alerts"));
+
+    http.Response res = await http.get(
+      Uri.parse(
+        "https://api.openweathermap.org/data/3.0/onecall?lat=${widget.lat}&lon=${widget.lng}&appid=3c1337f474bf021bc368451dfd604fca&units=metric&exclude=minutely,alerts",
+      ),
+    );
 
     Map<String, dynamic> dataJson = jsonDecode(res.body);
 
@@ -66,36 +69,43 @@ class _WeatherViewPageState extends State<WeatherViewPage> {
 
     List<dynamic> hourlyWeatherData = dataJson['hourly'];
     List<WeatherStatModel> hourlyWeather = hourlyWeatherData
-      .map((hourlyMap) => WeatherStatModel.fromJSON(hourlyMap as Map<String, dynamic>))
-      .toList();
+        .map(
+          (hourlyMap) =>
+              WeatherStatModel.fromJSON(hourlyMap as Map<String, dynamic>),
+        )
+        .toList();
 
     List<dynamic> dailyWeatherData = dataJson['daily'];
     List<DailyModel> dailyWeather = dailyWeatherData
-      .map((dayMap) => DailyModel.fromJSON(dayMap as Map<String, dynamic>))
-      .toList();
+        .map((dayMap) => DailyModel.fromJSON(dayMap as Map<String, dynamic>))
+        .toList();
 
-    hourlyWeather = hourlyWeather.sublist(1, 24);    
-    http.Response locRes = await http.get(Uri.parse("http://api.openweathermap.org/geo/1.0/reverse?lat=${widget.lat}&lon=${widget.lng}&limit=1&appid=3c1337f474bf021bc368451dfd604fca"));
-    
+    hourlyWeather = hourlyWeather.sublist(1, 24);
+    http.Response locRes = await http.get(
+      Uri.parse(
+        "http://api.openweathermap.org/geo/1.0/reverse?lat=${widget.lat}&lon=${widget.lng}&limit=1&appid=3c1337f474bf021bc368451dfd604fca",
+      ),
+    );
+
     List<dynamic> locData = jsonDecode(locRes.body);
     String cityName = limitStringToWords(locData[0]['name'], 2);
-    
+
     currentCity = CityModel(
       name: cityName,
-      lat: widget.lat, 
-      lng: widget.lng, 
-      currentWeather: currentWeather, 
+      lat: widget.lat,
+      lng: widget.lng,
+      currentWeather: currentWeather,
       hourlyWeather: hourlyWeather,
-      dailyWeather: dailyWeather
-    );  
-    
+      dailyWeather: dailyWeather,
+    );
+
     setState(() {
       loading = false;
     });
   }
 
-  void reloadWeather(){
-      _getCurrentCity();
+  void reloadWeather() {
+    _getCurrentCity();
   }
 
   @override
@@ -104,13 +114,12 @@ class _WeatherViewPageState extends State<WeatherViewPage> {
     _getCurrentCity();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: appBar(),
       backgroundColor: Colors.white,
-      body: _body()
+      body: _body(),
     );
   }
 
@@ -121,10 +130,8 @@ class _WeatherViewPageState extends State<WeatherViewPage> {
     );
   }
 
-  Widget _getCurrentView(){
-    if(!defaultView){
-
-    }
+  Widget _getCurrentView() {
+    if (!defaultView) {}
     return _currentDayView();
   }
 
@@ -133,10 +140,10 @@ class _WeatherViewPageState extends State<WeatherViewPage> {
       child: Column(
         children: [
           DataBox(weather: currentCity.currentWeather),
-          SizedBox(height: 30,),
+          SizedBox(height: 30),
           HourlyList(hourlyWeather: currentCity.hourlyWeather),
           SizedBox(height: 30),
-          DailyList(dailyWeather: currentCity.dailyWeather, days: days)
+          DailyList(dailyWeather: currentCity.dailyWeather, days: days),
         ],
       ),
     );
@@ -149,7 +156,7 @@ class _WeatherViewPageState extends State<WeatherViewPage> {
         style: TextStyle(
           color: Colors.black,
           fontSize: 22,
-          fontWeight: FontWeight.bold
+          fontWeight: FontWeight.bold,
         ),
       ),
       centerTitle: true,
@@ -163,7 +170,7 @@ class _WeatherViewPageState extends State<WeatherViewPage> {
           margin: EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: Color(0xffF7F8F8),
-            borderRadius: BorderRadius.circular(10)
+            borderRadius: BorderRadius.circular(10),
           ),
           alignment: Alignment.center,
           child: SvgPicture.asset(
@@ -182,7 +189,7 @@ class _WeatherViewPageState extends State<WeatherViewPage> {
             margin: EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: Color(0xffF7F8F8),
-              borderRadius: BorderRadius.circular(10)
+              borderRadius: BorderRadius.circular(10),
             ),
             alignment: Alignment.center,
             width: 37,
@@ -192,7 +199,7 @@ class _WeatherViewPageState extends State<WeatherViewPage> {
               width: 50,
             ),
           ),
-        ),  
+        ),
       ],
     );
   }
