@@ -10,10 +10,16 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutterllearnapp/models/city_model.dart';
-import 'package:geolocator/geolocator.dart';
 
 class WeatherViewPage extends StatefulWidget {
-  const WeatherViewPage({super.key});
+  final double lat;
+  final double lng;
+
+  const WeatherViewPage({
+    super.key,
+    required this.lat,
+    required this.lng
+  });
 
   @override
   State<WeatherViewPage> createState() => _WeatherViewPageState();
@@ -50,31 +56,8 @@ class _WeatherViewPageState extends State<WeatherViewPage> {
     setState(() {
       loading = true;
     });
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if(!serviceEnabled){
-      return;
-    }
-
-    LocationPermission premission; 
-    premission = await Geolocator.checkPermission();
-    if(premission == LocationPermission.denied){
-      premission = await Geolocator.requestPermission();
-      if(premission == LocationPermission.denied){
-        return;
-      }
-    }
-
-    if(premission == LocationPermission.deniedForever){
-      return;
-    }
-
-    Position currentPosition = await Geolocator.getCurrentPosition();
     
-    print(currentPosition.toString());
-    
-    double lat = currentPosition.latitude;
-    double lng = currentPosition.longitude;
-    http.Response res = await http.get(Uri.parse("https://api.openweathermap.org/data/3.0/onecall?lat=$lat&lon=$lng&appid=3c1337f474bf021bc368451dfd604fca&units=metric&exclude=minutely,alerts"));
+    http.Response res = await http.get(Uri.parse("https://api.openweathermap.org/data/3.0/onecall?lat=${widget.lat}&lon=${widget.lng}&appid=3c1337f474bf021bc368451dfd604fca&units=metric&exclude=minutely,alerts"));
 
     Map<String, dynamic> dataJson = jsonDecode(res.body);
 
@@ -92,15 +75,15 @@ class _WeatherViewPageState extends State<WeatherViewPage> {
       .toList();
 
     hourlyWeather = hourlyWeather.sublist(1, 24);    
-    http.Response locRes = await http.get(Uri.parse("http://api.openweathermap.org/geo/1.0/reverse?lat=$lat&lon=$lng&limit=1&appid=3c1337f474bf021bc368451dfd604fca"));
+    http.Response locRes = await http.get(Uri.parse("http://api.openweathermap.org/geo/1.0/reverse?lat=${widget.lat}&lon=${widget.lng}&limit=1&appid=3c1337f474bf021bc368451dfd604fca"));
     
     List<dynamic> locData = jsonDecode(locRes.body);
     String cityName = limitStringToWords(locData[0]['name'], 2);
     
     currentCity = CityModel(
       name: cityName,
-      lat: currentPosition.latitude, 
-      lng: currentPosition.longitude, 
+      lat: widget.lat, 
+      lng: widget.lng, 
       currentWeather: currentWeather, 
       hourlyWeather: hourlyWeather,
       dailyWeather: dailyWeather
@@ -174,6 +157,7 @@ class _WeatherViewPageState extends State<WeatherViewPage> {
       elevation: 0,
       leading: GestureDetector(
         onTap: () {
+          Navigator.pop(context);
         },
         child: Container(
           margin: EdgeInsets.all(10),

@@ -2,6 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterllearnapp/pages/weather_view.dart';
+import 'package:flutterllearnapp/widgets/loading_circle.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
 
@@ -15,18 +18,22 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final TextEditingController searchControler = TextEditingController();
   final String token = '1234567890';
+
   var uuid = const Uuid();
   List<dynamic> listOfLocation = [];
+
+  bool loading = false;
 
   @override
   void initState() {
     searchControler.addListener(() {
       _onChange();
     });
+    loading = false;
     super.initState();
   }
 
-  _onChange(){
+  void _onChange(){ 
     placeSuggestion(searchControler.text);
   }
 
@@ -38,7 +45,7 @@ class _HomePageState extends State<HomePage> {
       var response = await http.get(Uri.parse(requst));
       var data = jsonDecode(response.body);
       if(kDebugMode){
-        print(data);
+        // print(data);
       }
       if(response.statusCode == 200){
         setState(() {
@@ -59,7 +66,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text("Home"),
       ),
-      body: Padding(
+      body: loading ? LoadingCircle() : Padding(
         padding: EdgeInsets.all(20),
         child: Column(
           children: [
@@ -83,9 +90,18 @@ class _HomePageState extends State<HomePage> {
                   itemCount: listOfLocation.length,
                   itemBuilder: (context,index){
                     return GestureDetector(
-                      onTap: () {
-                        // TODO: geocode selected text and transfer to weather view
+                      onTap: () async {
+                        
                         searchControler.text = listOfLocation[index]['description'];
+                        
+                        http.Response response = await http.get(Uri.parse("https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyAK0_XCp4SpqPVDxuJnh4Rjz_NDgmuhXv0&address=${listOfLocation[index]['description']}"));
+                        Map<String, dynamic> data = jsonDecode(response.body);
+
+                        Map<String, dynamic> location = data['results'][0]['geometry']['location'];
+
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => WeatherViewPage(lat: location['lat'], lng: location['lng'],)));
+
+                        // TODO: geocode selected text and transfer to weather view
                       },
                       child: ListTile(
                         title: Text(
@@ -102,8 +118,48 @@ class _HomePageState extends State<HomePage> {
               child: Container(
                 margin: EdgeInsets.only(top: 20),
                 child: ElevatedButton(
-                  onPressed: (){
-                    // TODO: get current location and transfer to weather view
+                  onPressed: () async {
+                    setState(() {
+                      loading = true;
+                    });
+                    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+                    if(!serviceEnabled){
+                      setState(() {
+                        loading = false;
+                      });
+                      return;
+                    }
+
+                    LocationPermission premission; 
+                    premission = await Geolocator.checkPermission();
+                    if(premission == LocationPermission.denied){
+                      premission = await Geolocator.requestPermission();
+                      if(premission == LocationPermission.denied){
+                        setState(() {
+                          loading = false;
+                        });
+                        return;
+                      }
+                    }
+
+                    if(premission == LocationPermission.deniedForever){
+                      setState(() {
+                        loading = false;
+                      });
+                      return;
+                    }
+
+                    Position currentPosition = await Geolocator.getCurrentPosition();
+                    
+                    print(currentPosition.toString());
+                    
+                    double lat = currentPosition.latitude;
+                    double lng = currentPosition.longitude;
+
+                    setState(() {
+                      loading = false;
+                    });
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => WeatherViewPage(lat: lat, lng: lng,)));
                   }, 
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
