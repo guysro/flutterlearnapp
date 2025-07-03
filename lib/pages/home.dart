@@ -120,7 +120,6 @@ class _HomePageState extends State<HomePage> {
 
                         Map<String, dynamic> location =
                             data['results'][0]['geometry']['location'];
-
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -141,7 +140,23 @@ class _HomePageState extends State<HomePage> {
                           ),
                           child: Icon(Icons.location_on),
                         ),
+                        trailing: InkWell(
+                          borderRadius: BorderRadius.circular(25),
+                          onTap: () {
+                            searchControler.text =
+                                listOfLocation[index]['description'];
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Color(0x08000000),
+                              borderRadius: BorderRadius.circular(25),
+                            ),
+                            child: Icon(Icons.arrow_outward),
+                          ),
+                        ),
                       ),
+                      // ),
                     );
                   },
                   separatorBuilder: (context, index) {
